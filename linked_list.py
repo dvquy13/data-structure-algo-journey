@@ -8,97 +8,93 @@ class Node:
         self.prev = prev
 
 
-class MyLinkedList:
+class DoublyLinkedList:
     def __init__(self):
-        """
-        Initialize your data structure here.
-        """
+        self._size = 0
         self._head = None
-        self._length = 0
+        self._tail = None
 
-    def get(self, index: int) -> int:
-        """
-        Get the value of the index-th node in the linked list. If the index is invalid, return -1.
-        """
-        node = self._head
-        for _ in range(1, index + 1):
-            if node.next is None:
-                return -1
-            node = node.next
-        return node.val
+    def size(self):
+        return self._size
 
-    def addAtHead(self, val: int) -> None:
-        """
-        Add a node of value val before the first element of the linked list. After the insertion, the new node will be the first node of the linked list.
-        """
-        new_head = Node(val, next=self._head)
-        if self._head is not None:
-            self._head.prev = new_head
-        self._head = new_head
-        self._length += 1
-        return None
+    def isEmpty(self):
+        return self._head == None
 
-    def addAtTail(self, val: int) -> None:
-        """
-        Append a node of value val to the last element of the linked list.
-        """
-        node = self._head
-        for _ in range(1, self._length):
-            node = node.next
-        new_node = Node(val, prev=node)
-        node.next = new_node
-        self._length += 1
-        return None
-
-    def addAtIndex(self, index: int, val: int) -> None:
-        """
-        Add a node of value val before the index-th node in the linked list. If index equals to the length of linked list, the node will be appended to the end of linked list. If index is greater than the length, the node will not be inserted.
-        """
-        if index <= 0:
-            return self.addAtHead(val)
-        elif index == self._length:
-            # Add at tail, not using addAtTail method to avoid reprocessing
-            return self.addAtTail(val)
-        elif index > self._length:
+    def valueAt(self, index):
+        if self._invalid_index(index):
             return None
-        node = self._head
+        curr = self._head
         for _ in range(1, index + 1):
-            node = node.next
-        new_node = Node(val, next=node, prev=node.prev)
-        node.prev.next = new_node
-        node.prev = new_node
-        self._length += 1
+            curr = curr.next
+        return curr.val
+
+    def pushFront(self, item):
+        node = Node(item, next=self._head)
+        if self._head:
+            self._head.prev = node
+        self._head = node
+        self._size += 1
         return None
 
-    def deleteAtIndex(self, index: int) -> None:
-        """
-        Delete the index-th node in the linked list, if the index is valid.
-        """
+    def popFront(self):
+        popNode = self._head
+        self._head = self._head.next
+        self._head.prev = None
+        self._size -= 1
+        return popNode.val
+
+    def pushBack(self, value):
+        node = Node(value, prev=self._tail)
+        if self._tail:
+            self._tail.next = node
+        self._tail = node
+        self._size += 1
+        return None
+
+    def popBack(self):
+        popNode = self._tail
+        self._tail = self._tail.prev
+        self._tail.next = None
+        self._size -= 1
+        return popNode.val
+
+    def front(self):
+        return self._head.val
+
+    def back(self):
+        return self._tail.val
+
+    def insert(self, value, index):
+        if self._invalid_index(index):
+            return None
+        if index == self.size():
+            return self.pushBack(value)
         if index == 0:
-            self._head = self._head.next
-        elif index >= self._length or index < 0:
-            return None
-        node = self._head
+            return self.pushFront(value)
+        curr = self._head
         for _ in range(1, index + 1):
-            node = node.next
-        if node.next == None:
-            node.prev.next == None
-        else:
-            node.prev.next = node.next
-            node.next.prev = node.prev
-        self._length -= 1
+            curr = curr.next
+        node = Node(value, prev=curr.prev, next=curr)
+        curr.prev = node
+        self._size += 1
         return None
 
+    def removeAt(self, index):
+        if self._invalid_index(index):
+            return None
+        if index == 0:
+            self.popFront()
+            return None
+        if index == self.size():
+            self.popBack()
+            return None
+        curr = self._head
+        for _ in range(1, index + 1):
+            curr = curr.next
+        curr.prev.next = curr.next
+        curr.next.prev = curr.prev
+        self._size -= 1
+        return None
 
-# Your MyLinkedList object will be instantiated and called as such:
-method_calls = ["MyLinkedList","addAtHead","addAtTail","addAtTail","get","get","addAtTail","addAtIndex","addAtHead","addAtHead","addAtTail","addAtTail","addAtTail","addAtTail","get","addAtHead","addAtHead","addAtIndex","addAtIndex","addAtHead","addAtTail","deleteAtIndex","addAtHead","addAtHead","addAtIndex","addAtTail","get","addAtIndex","addAtTail","addAtHead","addAtHead","addAtIndex","addAtTail","addAtHead","addAtHead","get","deleteAtIndex","addAtTail","addAtTail","addAtHead","addAtTail","get","deleteAtIndex","addAtTail","addAtHead","addAtTail","deleteAtIndex","addAtTail","deleteAtIndex","addAtIndex","deleteAtIndex","addAtTail","addAtHead","addAtIndex","addAtHead","addAtHead","get","addAtHead","get","addAtHead","deleteAtIndex","get","addAtHead","addAtTail","get","addAtHead","get","addAtTail","get","addAtTail","addAtHead","addAtIndex","addAtIndex","addAtHead","addAtHead","deleteAtIndex","get","addAtHead","addAtIndex","addAtTail","get","addAtIndex","get","addAtIndex","get","addAtIndex","addAtIndex","addAtHead","addAtHead","addAtTail","addAtIndex","get","addAtHead","addAtTail","addAtTail","addAtHead","get","addAtTail","addAtHead","addAtTail","get","addAtIndex"]
-vals = [[],[84],[2],[39],[3],[1],[42],[1,80],[14],[1],[53],[98],[19],[12],[2],[16],[33],[4,17],[6,8],[37],[43],[11],[80],[31],[13,23],[17],[4],[10,0],[21],[73],[22],[24,37],[14],[97],[8],[6],[17],[50],[28],[76],[79],[18],[30],[5],[9],[83],[3],[40],[26],[20,90],[30],[40],[56],[15,23],[51],[21],[26],[83],[30],[12],[8],[4],[20],[45],[10],[56],[18],[33],[2],[70],[57],[31,24],[16,92],[40],[23],[26],[1],[92],[3,78],[42],[18],[39,9],[13],[33,17],[51],[18,95],[18,33],[80],[21],[7],[17,46],[33],[60],[26],[4],[9],[45],[38],[95],[78],[54],[42,86]]
-first = MyLinkedList()
-for i in range(1, len(method_calls)):
-    if method_calls[i] != 'get':
-        print(eval(f"first.{method_calls[i]}(*vals[i])"))
-    else:
-        if i == len(method_calls) - 2:
-            import pdb; pdb.set_trace()
-        print(first.get(*vals[i]))
-#%
+    def _invalid_index(self, index):
+        return not (index >= self.size() or index < 0)
